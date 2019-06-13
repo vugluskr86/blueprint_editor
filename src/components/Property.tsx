@@ -2,25 +2,21 @@ import * as React from "react";
 
 import ReactJson from 'react-json-view';
 
-export default class Property extends React.Component {
+export type PropertyProps = {
+  onChange?(values:any):void;
+}
+
+export default class Property extends React.Component<PropertyProps, any> {
   state = {
-    value: {
-      name: "amigo",
-      color: "",
-      html: "",
-      code: "",
-      chart: {
-        showLines: true,
-        axisX: {
-          showLines: true
-        }
-      },
-      array: [1, 2, 3]
-    }
+    value: {}
   };
 
   constructor(props = {}) {
     super(props);
+  }
+
+  public setValues(value:any) {
+    this.setState({ value });
   }
 
   render() {
@@ -28,8 +24,13 @@ export default class Property extends React.Component {
         <ReactJson 
         src={this.state.value}
         theme="ashes"
-        onEdit={(e)=>{}}
-        onDelete={(e)=>{}}
+        onEdit={(e:any)=>{ 
+          this.setState({ value: e.updated_src });
+          if(this.props.onChange) {
+            this.props.onChange(e.updated_src);
+          }
+         }}
+        onDelete={false}
         onAdd={(e)=>{}}
       /></div>
   }

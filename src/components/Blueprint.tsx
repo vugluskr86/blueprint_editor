@@ -1,5 +1,5 @@
 import * as React from "react";
-import { DefaultNodeModel, DiagramModel, DiagramEngine, DiagramWidget } from "storm-react-diagrams";
+import { DefaultNodeModel, DiagramModel, DiagramEngine, DiagramWidget, BaseEvent, BaseModel } from "storm-react-diagrams";
 import Toolbar, { ToolbarAction } from "./Toolbar";
 
 
@@ -20,7 +20,7 @@ export class BlueprintNodeModel extends DefaultNodeModel {
       this.addInPort(inputs[i]);
     }
     for(let i = 0; i < outputs.length; i++) {
-      this.addOutPort(inputs[i]);
+      this.addOutPort(outputs[i]);
     }
 
     Object.assign(this.properties, properties);
@@ -29,11 +29,16 @@ export class BlueprintNodeModel extends DefaultNodeModel {
   getProperties(): any {
     return this.properties;
   }
+
+  setProperties(properties: any): void {
+    this.properties = properties;
+  }
 }
 
 export type BlueprintToolbarAction = ToolbarAction;
 export type BlueprintProp = {
     actions?: BlueprintToolbarAction[];
+    onClick?(event: any): void;
 }
 
 type BlueprintState = {
@@ -70,6 +75,32 @@ export default class Blueprint<
   getFirstSelected() {
     const sel = this.getSelected();
     return sel.length > 0 ? sel[0] : null;
+  }
+
+  updateEventListeners() {
+    const nodes = this.state.model.getNodes();
+    const keys = Object.keys(nodes);
+    for(let i = 0; i < keys.length; i++) {
+      const node = nodes[keys[i]];
+      node.addListener({
+        selectionChanged: (event: any) => {
+          if(this.props.onClick) {
+            this.props.onClick(event)
+          }
+        },
+      });
+    }
+  }
+
+  updateNode(updated:any) {
+    const nodes = this.state.model.getNodes();
+    const keys = Object.keys(nodes);
+    for(let i = 0; i < keys.length; i++) {
+      if(keys[i] === updated.id) {
+        // const node = nodes[keys[i]];
+        //(node as BlueprintNodeModel).setProperties(updated);
+      }
+    }
   }
 
   render() {

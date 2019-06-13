@@ -14,6 +14,9 @@ export default class App extends React.Component {
     model: null
   };
 
+  propRef:React.RefObject<Property> = React.createRef();
+  locRef:React.RefObject<Locations> = React.createRef();
+
   constructor(props = {}) {
     super(props);
 
@@ -79,10 +82,23 @@ export default class App extends React.Component {
       return <div className="panel">Panel {node.getName()}</div>;
     }
     if (component === "Property") {
-      return <Property />;
+      return <Property ref={this.propRef} onChange={(values:any)=>{
+        console.log('change', values);
+        if(this.locRef.current) {
+          this.locRef.current.updateNode(values);
+        }
+      }} />;
     }
     if (component === "Locations") {
-      return <Locations />;
+      return <Locations ref={this.locRef} onClick={(ev:any)=>{
+        if(this.propRef.current) {
+          this.propRef.current.setValues({
+            id: ev.entity.id,
+            name: ev.entity.name,
+            color: ev.entity.color,
+          });
+        }
+      }} />;
     }
     if (component === "Files") {
       return <Files />;

@@ -15,8 +15,10 @@ export default class Locations extends Blueprint {
 
         const ch = new Chance();
 
-        this.root = new BlueprintNodeModel("root", ch.color(), [], [], {});
+        this.root = new BlueprintNodeModel("root", ch.color(), ["in"], ["out"], {});
         this.state.model.addNode(this.root);
+
+        this.updateEventListeners();
 
         if(this.props.actions) {
             this.props.actions.push({
@@ -25,6 +27,9 @@ export default class Locations extends Blueprint {
                 onClick: () => {
                     const name: string | null = prompt("name");
                     if(name) {
+                        const node = new BlueprintNodeModel(name, ch.color(), ["in"], ["out"], {});
+                        this.state.model.addNode(node);
+                        this.updateEventListeners();
                         this.forceUpdate();
                     }
                 }
